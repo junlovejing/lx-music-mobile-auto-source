@@ -8,9 +8,12 @@ import { COMPONENT_IDS } from '@/config/constant'
 import { scaleSizeW } from '@/utils/pixelRatio'
 import type { InitState as CommonState } from '@/store/common/state'
 
+import { useUserApiList } from '@/store/userApi'
+import Text from '@/components/common/Text'
+
 const MAX_WIDTH = scaleSizeW(560)
 
-export default () => {
+const SourceContent = () => {
   const drawer = useRef<DrawerLayoutFixedType>(null)
   const theme = useTheme()
 
@@ -55,4 +58,9 @@ export default () => {
       <Content />
     </DrawerLayoutFixed>
   )
+}
+
+export default () => {
+  const sources = useUserApiList()
+  return sources.length ? <SourceContent /> : <Text>请在设置中导入自定义源</Text>
 }

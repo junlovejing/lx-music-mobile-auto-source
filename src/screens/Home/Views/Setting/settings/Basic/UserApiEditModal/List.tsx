@@ -6,18 +6,20 @@ import { useTheme } from '@/store/theme/hook'
 import { useI18n } from '@/lang'
 import { useUserApiList, state as userApiState } from '@/store/userApi'
 import { useSettingValue } from '@/store/setting/hook'
-import { removeUserApi, setUserApiAllowShowUpdateAlert } from '@/core/userApi'
+import { removeUserApi, setUserApiAllowShowUpdateAlert, setUserApiList } from '@/core/userApi'
 import { BorderRadius } from '@/theme'
 import CheckBox from '@/components/common/CheckBox'
 import { Icon } from '@/components/common/Icon'
 import settingState from '@/store/setting/state'
 import apiSourceInfo from '@/utils/musicSdk/api-source-info'
 import { setApiSource } from '@/core/apiSource'
+import { replaceUserApiList } from '@/utils/data'
 
 const formatVersionName = (version: string) => {
   return /^\d/.test(version) ? `v${version}` : version
 }
-const ListItem = ({ item, activeId, onRemove, onChangeAllowShowUpdateAlert }: {
+const ListItem = ({ item, activeId, onRemove, onChangeAllowShowUpdateAlert, onMoveUp }: {
+  onMoveUp: (id: string) => void
   item: LX.UserApi.UserApiInfo
   activeId: string
   onRemove: (id: string, name: string) => void
@@ -56,6 +58,9 @@ const ListItem = ({ item, activeId, onRemove, onChangeAllowShowUpdateAlert }: {
         <CheckBox check={item.allowShowUpdateAlert} label={t('user_api_allow_show_update_alert')} onChange={changeAllowShowUpdateAlert} size={0.86} />
       </View>
       <View style={styles.listItemRight}>
+        <TouchableOpacity style={styles.btn} onPress={() => { onMoveUp(item.id) }} accessibilityLabel="上移自定义源">
+          <Text>↑</Text>
+        </TouchableOpacity>
         <TouchableOpacity style={styles.btn} onPress={handleRemove}>
           <Icon name="close" color={theme['c-button-font']} />
         </TouchableOpacity>
@@ -79,6 +84,15 @@ export default () => {
   const theme = useTheme()
   const t = useI18n()
 
+  const handleMoveUp = async(id: string) => {
+    const next = [...userApiState.list]
+    const index = next.findIndex(item => item.id === id)
+    if (index <= 0) return
+    const previous = next[index - 1]
+    next[index - 1] = next[index]
+    next[index] = previous
+    setUserApiList(await replaceUserApiList(next))
+  }
   const handleRemove = useCallback(async(id: string, name: string) => {
     const confirm = await confirmDialog({
       message: global.i18n.t('user_api_remove_tip', { name }),
@@ -88,7 +102,7 @@ export default () => {
     })
     if (!confirm) return
     void removeUserApi([id]).finally(() => {
-      if (settingState.setting['common.apiSource'] == id) {
+      if (settingState.setting['common.apiSource'] == id || !userApiState.list.length) {
         let backApiId = apiSourceInfo.find(api => !api.disabled)?.id
         if (!backApiId) backApiId = userApiState.list[0]?.id
         setApiSource(backApiId ?? '')
@@ -110,6 +124,7 @@ export default () => {
                 key={item.id}
                 item={item}
                 activeId={apiSource}
+                onMoveUp={id => { void handleMoveUp(id) }}
                 onRemove={handleRemove}
                 onChangeAllowShowUpdateAlert={handleChangeAllowShowUpdateAlert}
               />

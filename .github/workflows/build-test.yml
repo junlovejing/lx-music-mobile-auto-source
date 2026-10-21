@@ -3,7 +3,7 @@ name: Run build test
 on:
   pull_request:
     branches:
-      - dev
+      - main
 
 jobs:
   test:
@@ -20,6 +20,9 @@ jobs:
 
       - name: Install Dependencies
         run: npm ci
+
+      - name: Check custom source policy
+        run: npm run check:custom-sources && npm run test:custom-sources
 
       - name: Eslint check
         run: npm run lint

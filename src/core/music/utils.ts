@@ -295,21 +295,46 @@ export const handleGetOnlineMusicUrl = async({ musicInfo, quality, onToggleSourc
   quality: LX.Quality
   isFromCache: boolean
 }> => {
-  if (!await global.lx.apiInitPromise[0]) throw new Error('source init failed')
   // console.log(musicInfo.source)
   const targetQuality = quality ?? getPlayQuality(settingState.setting['player.playQuality'], musicInfo)
 
-  let reqPromise
-  try {
-    reqPromise = musicSdk[musicInfo.source].getMusicUrl(toOldMusicInfo(musicInfo), targetQuality).promise
-  } catch (err: any) {
-    reqPromise = Promise.reject(err)
+  const tryOnce = async(): Promise<{ url: string, type: LX.Quality }> => {
+    if (!await global.lx.apiInitPromise[0]) throw new Error('source init failed')
+    let reqPromise
+    try {
+      reqPromise = musicSdk[musicInfo.source].getMusicUrl(toOldMusicInfo(musicInfo), targetQuality).promise
+    } catch (err: any) {
+      reqPromise = Promise.reject(err)
+    }
+    return reqPromise
   }
-  return reqPromise.then(({ url, type }: { url: string, type: LX.Quality }) => {
+
+  const initialAttempt = async() => {
+    if (settingState.setting['common.apiSource'] === 'user_api_auto') {
+      const { loadUserSource } = await import('@/core/userApiFailover')
+      const { resolveInitialSourceId } = await import('@/sources/userSources')
+      const firstId = resolveInitialSourceId()
+      if (!firstId) throw new Error('请在设置中导入自定义源')
+      await loadUserSource(firstId)
+    }
+    return tryOnce()
+  }
+  return initialAttempt().then(({ url, type }: { url: string, type: LX.Quality }) => {
     return { musicInfo, url, quality: type, isFromCache: false }
   }).catch(async(err: any) => {
     console.log(err)
-    if (!allowToggleSource || err.message == requestMsg.tooManyRequests) throw err
+    // 仅在「取播放地址」层：用户开启多源自动切换后按列表顺序重试同一首歌
+    try {
+      const { isAutoApiSource, tryUserSourceFailover } = await import('@/core/userApiFailover')
+      if (isAutoApiSource() || (settingState.setting['common.sourceListUrl'] && settingState.setting['common.apiSource'].startsWith('user_api_subscription_'))) {
+        const songKey = `${musicInfo.name}\n${musicInfo.singer}\n${musicInfo.interval}`
+        const result = await tryUserSourceFailover(tryOnce, songKey)
+        return { musicInfo, url: result.url, quality: result.type, isFromCache: false }
+      }
+    } catch (failoverErr: any) {
+      console.log('[userApi failover]', failoverErr?.message ?? failoverErr)
+    }
+    if (settingState.setting['common.apiSource'] === 'user_api_auto' || !allowToggleSource || err.message == requestMsg.tooManyRequests) throw err
     onToggleSource()
     // eslint-disable-next-line @typescript-eslint/promise-function-async
     return getOtherSource(musicInfo).then(otherSource => {
@@ -442,7 +467,7 @@ export const getOnlineOtherSourceLyricInfo = async({ musicInfos, onToggleSource,
   let reqPromise
   try {
     // TODO: remove any type
-    reqPromise = (musicSdk[musicInfo.source].getLyric(toOldMusicInfo(musicInfo)) as any).promise
+    reqPromise = musicSdk[musicInfo.source].getLyric(toOldMusicInfo(musicInfo)).promise
   } catch (err: any) {
     reqPromise = Promise.reject(err)
   }
@@ -477,7 +502,7 @@ export const handleGetOnlineLyricInfo = async({ musicInfo, onToggleSource, isRef
   let reqPromise
   try {
     // TODO: remove any type
-    reqPromise = (musicSdk[musicInfo.source].getLyric(toOldMusicInfo(musicInfo)) as any).promise
+    reqPromise = musicSdk[musicInfo.source].getLyric(toOldMusicInfo(musicInfo)).promise
   } catch (err) {
     reqPromise = Promise.reject(err)
   }

@@ -1,4 +1,4 @@
-import { initSetting, showPactModal } from '@/core/common'
+import { initSetting, showPactModal, updateSetting } from '@/core/common'
 import registerPlaybackService from '@/plugins/player/service'
 import initTheme from './theme'
 import initI18n from './i18n'
@@ -11,17 +11,16 @@ import { initDeeplink } from './deeplink'
 import { setApiSource } from '@/core/apiSource'
 import commonActions from '@/store/common/action'
 import settingState from '@/store/setting/state'
-import { checkUpdate } from '@/core/version'
 import { bootLog } from '@/utils/bootLog'
-import { cheatTip } from '@/utils/tools'
+import { initializeUserSources } from '@/sources/userSources'
 
 let isFirstPush = true
 const handlePushedHomeScreen = async() => {
-  await cheatTip()
+  // fork：跳过「谨防被骗」首启弹窗（cheatTip / @cheat_tip），不写存储
   if (settingState.setting['common.isAgreePact']) {
     if (isFirstPush) {
       isFirstPush = false
-      void checkUpdate()
+      // fork：冷启动不自动检查官方更新；手动入口在设置-版本
       void initDeeplink()
     }
   } else {
@@ -47,6 +46,13 @@ export default async() => {
 
   await initUserApi(setting)
   bootLog('User Api inited.')
+
+  const sources = await initializeUserSources()
+  const selected = setting['common.apiSource']
+  if ((selected !== 'user_api_auto' && !sources.some(item => item.id === selected)) || !sources.length) {
+    updateSetting({ 'common.apiSource': '' })
+    setting['common.apiSource'] = ''
+  }
 
   setApiSource(setting['common.apiSource'])
   bootLog('Api inited.')

@@ -100,7 +100,7 @@ def getNpmPackageJson() {
 def npmPackageJson = getNpmPackageJson()
 def verCode = npmPackageJson["versionCode"]
 def verName = npmPackageJson["version"]
-def applicationName = npmPackageJson["name"]
+def applicationName = "lx-music-mobile"
 
 android {
     ndkVersion rootProject.ext.ndkVersion
@@ -135,12 +135,18 @@ android {
             } else {
                 def keystorePropertiesFile = rootProject.file("keystore.properties")
                 def keystoreProperties = new Properties()
-                keystoreProperties.load(new FileInputStream(keystorePropertiesFile))
-
-                storeFile file(keystoreProperties['storeFile'])
-                storePassword keystoreProperties['storePassword']
-                keyAlias keystoreProperties['keyAlias']
-                keyPassword keystoreProperties['keyPassword']
+                if (keystorePropertiesFile.exists()) {
+                    keystoreProperties.load(new FileInputStream(keystorePropertiesFile))
+                    storeFile file(keystoreProperties['storeFile'])
+                    storePassword keystoreProperties['storePassword']
+                    keyAlias keystoreProperties['keyAlias']
+                    keyPassword keystoreProperties['keyPassword']
+                } else {
+                    storeFile file('debug.keystore')
+                    storePassword 'android'
+                    keyAlias 'androiddebugkey'
+                    keyPassword 'android'
+                }
             }
         }
         debug {

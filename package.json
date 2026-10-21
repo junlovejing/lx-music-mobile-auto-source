@@ -1,9 +1,11 @@
 {
-  "name": "lx-music-mobile",
+  "name": "lx-music-enhanced",
   "version": "1.9.2",
   "versionCode": 79,
   "private": true,
   "scripts": {
+    "test:custom-sources": "node --test scripts/custom-sources.test.cjs",
+    "check:custom-sources": "node scripts/check-custom-sources.cjs",
     "dev": "react-native run-android --active-arch-only",
     "ios": "react-native run-ios",
     "start": "react-native start",

@@ -5,6 +5,7 @@ import { log as writeLog } from '@/utils/log'
 
 
 export const setUserApi = async(apiId: string) => {
+  global.lx.apis = {}
   global.lx.qualityList = {}
   setUserApiStatus(false, 'initing')
 

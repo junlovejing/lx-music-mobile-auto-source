@@ -519,8 +519,28 @@ export const getUserApiList = async(): Promise<LX.UserApi.UserApiInfo[]> => {
   return [...userApis]
 }
 export const getUserApiScript = async(id: string): Promise<string> => {
-  const script = await getData<string>(`${userApiPrefix}${id}`) ?? ''
-  return script
+  return await getData<string>(`${userApiPrefix}${id}`) ?? ''
+}
+
+export const replaceUserApiList = async(list: LX.UserApi.UserApiInfo[]) => {
+  const next = list.map(item => {
+    const copy: LX.UserApi.UserApiInfo & { script?: string } = { ...item }
+    delete copy.script
+    return copy
+  })
+  await saveData(userApiPrefix, next)
+  userApis = next
+  return [...userApis]
+}
+
+export const writeUserApiScripts = async(entries: Array<{ id: string, script: string }>) => {
+  if (!entries.length) return
+  await saveDataMultiple(entries.map(entry => [`${userApiPrefix}${entry.id}`, entry.script]))
+}
+
+export const removeUserApiScripts = async(ids: string[]) => {
+  if (!ids.length) return
+  await removeDataMultiple(ids.map(id => `${userApiPrefix}${id}`))
 }
 
 const INFO_NAMES = {
@@ -572,12 +592,12 @@ export const addUserApi = async(script: string): Promise<LX.UserApi.UserApiInfo>
 }
 export const removeUserApi = async(ids: string[]) => {
   if (!userApis) return []
+  const removeIds = ids
   const _ids: string[] = []
   for (let index = userApis.length - 1; index > -1; index--) {
-    if (ids.includes(userApis[index].id)) {
+    if (removeIds.includes(userApis[index].id)) {
       _ids.push(`${userApiPrefix}${userApis[index].id}`)
       userApis.splice(index, 1)
-      ids.splice(index, 1)
     }
   }
   await saveData(userApiPrefix, userApis)

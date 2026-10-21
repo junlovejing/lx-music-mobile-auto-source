@@ -1,6 +1,6 @@
-import { memo, useCallback, useMemo, useRef } from 'react'
+import { memo, useCallback, useMemo, useRef, useState } from 'react'
 
-import { View } from 'react-native'
+import { View, TextInput } from 'react-native'
 
 import SubTitle from '../../components/SubTitle'
 import CheckBox from '@/components/common/CheckBox'
@@ -14,7 +14,9 @@ import Button from '../../components/Button'
 import UserApiEditModal, { type UserApiEditModalType } from './UserApiEditModal'
 import Text from '@/components/common/Text'
 import { useTheme } from '@/store/theme/hook'
-// import { importUserApi, removeUserApi } from '@/core/userApi'
+import { updateSetting } from '@/core/common'
+import { state as userApiState } from '@/store/userApi/state'
+import { applyRemoteSourceFallback } from '@/sources/remoteSourceFallback'
 
 const apiSourceList = apiSourceInfo.map(api => ({
   id: api.id,
@@ -54,6 +56,37 @@ const Item = ({ id, name, desc, statusLabel, change }: {
 }
 
 export default memo(() => {
+  const savedCatalogUrl = useSettingValue('common.sourceListUrl')
+  const [catalogUrl, setCatalogUrl] = useState(savedCatalogUrl)
+  const [updating, setUpdating] = useState(false)
+  const [updateMessage, setUpdateMessage] = useState('')
+  const updateCatalog = async() => {
+    if (updating) return
+    setUpdating(true)
+    try {
+      const url = catalogUrl.trim()
+      if (url && !/^https?:\/\//i.test(url)) {
+        setUpdateMessage('请输入有效的源清单地址')
+        return
+      }
+      updateSetting({ 'common.sourceListUrl': url })
+      if (!url) {
+        setUpdateMessage('订阅已清除，自动更新已停用')
+        return
+      }
+      const changed = await applyRemoteSourceFallback(url, true)
+      if (changed) {
+        const selected = apiSourceSetting === 'user_api_auto' || userApiState.list.some(item => item.id === apiSourceSetting)
+          ? apiSourceSetting : userApiState.list[0]?.id ?? ''
+        setApiSource(selected)
+      }
+      setUpdateMessage(changed ? '订阅已保存并更新，失效时将自动检查更新' : '订阅已保存；清单无变化或暂时无法下载，失效时会自动检查')
+    } catch {
+      setUpdateMessage('清单更新失败')
+    } finally {
+      setUpdating(false)
+    }
+  }
   const t = useI18n()
   const list = useMemo(() => apiSourceList.map(s => ({
     // @ts-expect-error
@@ -98,6 +131,9 @@ export default memo(() => {
   return (
     <SubTitle title={t('setting_basic_source')}>
       <View style={styles.list}>
+        {!userApiList.length ? <Text>请在设置中导入自定义源</Text> : (
+          <Item name="多源自动切换" id="user_api_auto" change={id => { setApiSourceId(apiSourceSetting === id ? userApiList[0].id : id) }} />
+        )}
         {
           list.map(({ id, name }) => <Item name={name} id={id} key={id} change={setApiSourceId} />)
         }
@@ -108,6 +144,9 @@ export default memo(() => {
       <View style={styles.btn}>
         <Button onPress={handleShow}>{t('setting_basic_source_user_api_btn')}</Button>
       </View>
+      <TextInput value={catalogUrl} onChangeText={setCatalogUrl} placeholder="https://example.com/sources.json" accessibilityLabel="源清单地址" autoCapitalize="none" />
+      <Button disabled={updating} onPress={() => { void updateCatalog() }}>{updating ? '更新中…' : '保存并更新订阅'}</Button>
+      {updateMessage ? <Text>{updateMessage}</Text> : null}
       <UserApiEditModal ref={modalRef} />
     </SubTitle>
   )

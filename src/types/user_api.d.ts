@@ -22,6 +22,8 @@ declare namespace LX {
       author: string
       homepage: string
       version: string
+      /** 目录里的脚本地址。有本地正文时播放不再按这个地址请求。 */
+      scriptUrl?: string
       sources?: UserApiSources
     }
 

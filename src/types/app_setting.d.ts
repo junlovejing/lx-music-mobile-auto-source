@@ -21,6 +21,9 @@ declare global {
        */
       'common.apiSource': string
 
+      /** 用户保存的源订阅地址，空字符串表示禁用订阅更新 */
+      'common.sourceListUrl': string
+
       /**
        * 音源名称类型，原名、别名
        */

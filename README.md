@@ -1,117 +1,69 @@
-<p align="center"><a href="https://github.com/lyswhut/lx-music-mobile"><img width="200" src="https://github.com/lyswhut/lx-music-mobile/blob/master/doc/images/icon.png" alt="lx-music logo"></a></p>
+# 洛雪增强版
 
-<h1 align="center">LX Music 移动版</h1>
+基于 [lyswhut/lx-music](https://github.com/lyswhut/lx-music) 系列项目的 [lx-music-mobile](https://github.com/lyswhut/lx-music-mobile) 二次开发。采用 Apache-2.0 许可证，保留原作者版权声明。修改说明见 [NOTICE](NOTICE)。
 
-<p align="center">
-  <a href="https://github.com/lyswhut/lx-music-mobile/releases"><img src="https://img.shields.io/github/release/lyswhut/lx-music-mobile" alt="Release version"></a>
-  <a href="https://github.com/lyswhut/lx-music-mobile/actions/workflows/release.yml"><img src="https://github.com/lyswhut/lx-music-mobile/workflows/Build/badge.svg" alt="Build status"></a>
-  <a href="https://github.com/lyswhut/lx-music-mobile/actions/workflows/beta-pack.yml"><img src="https://github.com/lyswhut/lx-music-mobile/workflows/Build%20Beta/badge.svg" alt="Build status"></a>
-  <a href="https://github.com/facebook/react-native"><img src="https://img.shields.io/github/package-json/dependency-version/lyswhut/lx-music-mobile/react-native/master" alt="React native version"></a>
-  <!-- <a href="https://github.com/lyswhut/lx-music-mobile/releases"><img src="https://img.shields.io/github/downloads/lyswhut/lx-music-mobile/latest/total" alt="Downloads"></a> -->
-  <a href="https://github.com/lyswhut/lx-music-mobile/tree/dev"><img src="https://img.shields.io/github/package-json/v/lyswhut/lx-music-mobile/dev" alt="Dev branch version"></a>
-  <!-- <a href="https://github.com/lyswhut/lx-music-mobile/blob/master/LICENSE"><img src="https://img.shields.io/github/license/lyswhut/lx-music-mobile" alt="License"></a> -->
-</p>
+本软件不提供任何音源。全新安装后自定义源列表为空，「多源自动切换」默认关闭，订阅地址默认为空。没有源时会提示「请在设置中导入自定义源」。
 
-<p align="center">一个基于 React Native 开发的音乐软件</p>
+## 安装包下载
 
-## 说明
+[GitHub Release 页面](https://github.com/shellsec/lx-music-mobile-auto-source/releases)
 
-所用技术栈：
+以下为 **`v1.9.1`** 的各架构安装包，均不包含内置音源。常见 Android 手机可优先选择 arm64-v8a；不确定架构时可选择 universal 通用包。
 
-- React Native
-- Redux
+| 架构 | 原始下载 | 加速下载 |
+| --- | --- | --- |
+| arm64-v8a（常见 Android 手机） | [GitHub 下载](https://github.com/shellsec/lx-music-mobile-auto-source/releases/download/v1.9.1/lx-music-mobile-v1.9.1-arm64-v8a.apk) | [加速下载](https://ghfast.top/https://github.com/shellsec/lx-music-mobile-auto-source/releases/download/v1.9.1/lx-music-mobile-v1.9.1-arm64-v8a.apk) |
+| armeabi-v7a（32 位设备） | [GitHub 下载](https://github.com/shellsec/lx-music-mobile-auto-source/releases/download/v1.9.1/lx-music-mobile-v1.9.1-armeabi-v7a.apk) | [加速下载](https://ghfast.top/https://github.com/shellsec/lx-music-mobile-auto-source/releases/download/v1.9.1/lx-music-mobile-v1.9.1-armeabi-v7a.apk) |
+| universal（通用包） | [GitHub 下载](https://github.com/shellsec/lx-music-mobile-auto-source/releases/download/v1.9.1/lx-music-mobile-v1.9.1-universal.apk) | [加速下载](https://ghfast.top/https://github.com/shellsec/lx-music-mobile-auto-source/releases/download/v1.9.1/lx-music-mobile-v1.9.1-universal.apk) |
+| x86_64 | [GitHub 下载](https://github.com/shellsec/lx-music-mobile-auto-source/releases/download/v1.9.1/lx-music-mobile-v1.9.1-x86_64.apk) | [加速下载](https://ghfast.top/https://github.com/shellsec/lx-music-mobile-auto-source/releases/download/v1.9.1/lx-music-mobile-v1.9.1-x86_64.apk) |
+| x86 | [GitHub 下载](https://github.com/shellsec/lx-music-mobile-auto-source/releases/download/v1.9.1/lx-music-mobile-v1.9.1-x86.apk) | [加速下载](https://ghfast.top/https://github.com/shellsec/lx-music-mobile-auto-source/releases/download/v1.9.1/lx-music-mobile-v1.9.1-x86.apk) |
 
-已支持的平台：
+加速下载由第三方 [下载加速服务](https://ghfast.top/) 提供。后续版本可在该页面粘贴对应 APK 的 GitHub 下载链接。本项目不在软件中内置下载代理或音源地址。
 
-- Android 5 及以上
+## 导入自定义源
 
-***注：目前没有计划支持 iOS 和 HarmonyOS NEXT**。*<br>
-*桌面版项目地址：<https://github.com/lyswhut/lx-music-desktop>*<br>
-*LX Music 项目发展调整与新项目计划：https://github.com/lyswhut/lx-music-desktop/issues/1912*
+1. 打开设置中的自定义源管理入口。
+2. 选择「本地导入」导入自己准备的脚本，或通过「在线导入」输入自己的脚本地址。
+3. 导入后选择要使用的自定义源。管理列表支持删除和调整顺序。
 
-软件变化请查看[更新日志](https://github.com/lyswhut/lx-music-mobile/blob/master/CHANGELOG.md)。
+以下为自定义源管理的操作示意。列表中的内容由用户自行导入，不代表软件内置或推荐的来源；不同客户端版本的布局和按钮名称可能不同。
 
-软件下载请查看 [GitHub Releases](https://github.com/lyswhut/lx-music-mobile/releases)。
+![自定义源管理操作示意](docs/screenshots/custom-source-management.png)
 
-使用常见问题请参阅[移动版常见问题](https://lyswhut.github.io/lx-music-doc/mobile/faq)。
+## 多源自动切换
 
-目前本项目的原始发布地址只有 [**GitHub**](https://github.com/lyswhut/lx-music-mobile/releases)，其他渠道均为第三方转载发布，与本项目无关！
+需要自动尝试其他已导入源时，在设置中选中「多源自动切换」。播放地址获取失败后，会按用户列表顺序尝试其余已导入源；每首歌曲先从列表首项开始尝试。可以在源管理列表中调整优先顺序。
 
-为了提高使用门槛，本软件内的默认设置、UI 操作不以新手友好为目标，所以使用前建议先根据你的喜好浏览调整一遍软件设置，阅读一遍[音乐播放列表机制](https://lyswhut.github.io/lx-music-doc/mobile/faq/playlist)。
+![用户手动启用多源自动切换后的示意](docs/screenshots/multi-source-switching.png)
 
-### 数据同步服务
+图中为用户手动开启后的状态，首次安装默认关闭。选择具体源即可关闭多源自动切换。此功能仅使用用户自行导入或订阅的源。
 
-从 v1.0.0 起，我们发布了一个独立的[数据同步服务](https://github.com/lyswhut/lx-music-sync-server#readme)。如果你有服务器，可以将其部署到服务器上作为私人多端同步服务使用，详情看该项目说明。
+## 订阅自动更新
 
-## 贡献代码
+用户只需添加并保存一次自己的订阅地址，重启后仍会保留，无需每次重新填写。
 
-本项目欢迎 PR，但为了 PR 能顺利合并，需要注意以下几点：
+1. 在设置中的源清单地址输入框填写自己的地址，例如 `https://example.com/sources.json`。
+2. 点击「保存并更新订阅」，下载清单中的源脚本。上方管理示意图中的「从源清单地址更新」表示同类操作，当前版本按钮以实际界面为准。
+3. 后续播放失败时自动检查这个已保存的订阅；也可以随时点击按钮手动更新。
 
-- 对于添加新功能的 PR，建议在提交 PR 前先创建 Issue 进行说明，以确认该功能是否确实需要；
-- 对于修复 bug 的 PR，请提供修复前后的说明及重现方式；
-- 对于其他类型的 PR，则适当附上说明。
+自动更新的触发方式：
 
-贡献代码步骤：
+- **选定单个订阅源时**：该源获取播放地址失败后检查订阅，有更新则重新加载并重试同一个源，不会自动开启多源切换。
+- **开启多源自动切换时**：先按顺序尝试完已导入源；全部失败后检查订阅，有更新则按用户列表顺序再试一轮。
+- **没有变化或下载失败时**：保留本地内容，停止本次更新重试。同一首歌曲的近期失败最多触发一次，同一订阅地址的自动检查至少间隔一分钟，避免反复请求。
 
-1. 参照[源码使用方法](https://lyswhut.github.io/lx-music-doc/mobile/use-source-code)设置开发环境；
-2. 克隆本仓库代码并切换至 `dev` 分支进行开发；
-3. 提交 PR 至 `dev` 分支。
+只有清单或脚本内容有变化才重试播放；只有全部脚本下载成功才更新列表。更新保留手动导入的源及已有列表顺序，新加入的订阅源追加到列表末尾。启动时不会主动下载。
 
-<!--
-## 用户界面
+清空订阅地址并点击保存，即可停止订阅自动更新；已经导入的源仍保留在本地。本地导入且不属于订阅的脚本，不会因添加订阅而自动获得更新。
 
-<p><img width="100%" src="https://github.com/lyswhut/lx-music-mobile/blob/master/doc/images/app.png" alt="lx-music mobile UI"></p> -->
+清单支持包含 `id`、`name`、`url` 字段的对象数组，也兼容 `{ "sources": [...] }` 格式。每项 `id` 应唯一，`url` 是用户自行提供的脚本地址；相对路径按清单所在目录解析。
 
-## 项目协议
+## 构建
 
-本项目基于 [Apache License 2.0](https://github.com/lyswhut/lx-music-mobile/blob/master/LICENSE) 许可证发行，以下协议是对于 Apache License 2.0 的补充，如有冲突，以以下协议为准。
+安装 Node.js 18+、Android SDK 和 Java 17，执行 `npm ci`，然后执行 `npm run pack:android`。产物位于 `android/app/build/outputs/apk/release/`，文件名沿用 `lx-music-mobile-v版本号-架构.apk` 格式。
 
----
+CI 在打包前检查预置脚本，并在发布前检查 APK 中的源脚本（保留上游自定义源运行环境桥接文件）。
 
-*词语约定：本协议中的“本项目”指 LX Music（洛雪音乐）移动版项目；“使用者”指签署本协议的使用者；“官方音乐平台”指对本项目内置的包括酷我、酷狗、咪咕等音乐源的官方平台统称；“版权数据”指包括但不限于图像、音频、名字等在内的他人拥有所属版权的数据。*
+## 免责声明
 
-### 一、数据来源
-
-1.1 本项目的各官方平台在线数据来源原理是从其公开服务器中拉取数据（与未登录状态在官方平台 APP 获取的数据相同），经过对数据简单地筛选与合并后进行展示，因此本项目不对数据的合法性、准确性负责。
-
-1.2 本项目本身没有获取某个音频数据的能力，本项目使用的在线音频数据来源来自软件设置内“自定义源”设置所选择的“源”返回的在线链接。例如播放某首歌，本项目所做的只是将希望播放的歌曲名、艺术家等信息传递给“源”，若“源”返回了一个链接，则本项目将认为这就是该歌曲的音频数据而进行使用，至于这是不是正确的音频数据本项目无法校验其准确性，所以使用本项目的过程中可能会出现希望播放的音频与实际播放的音频不对应或者无法播放的问题。
-
-1.3 本项目的非官方平台数据（例如“我的列表”内列表）来自使用者本地系统或者使用者连接的同步服务，本项目不对这些数据的合法性、准确性负责。
-
-### 二、版权数据
-
-2.1 使用本项目的过程中可能会产生版权数据。对于这些版权数据，本项目不拥有它们的所有权。为了避免侵权，使用者务必在 **24 小时内** 清除使用本项目的过程中所产生的版权数据。
-
-### 三、音乐平台别名
-
-3.1 本项目内的官方音乐平台别名为本项目内对官方音乐平台的一个称呼，不包含恶意。如果官方音乐平台觉得不妥，可联系本项目更改或移除。
-
-### 四、资源使用
-
-4.1 本项目内使用的部分包括但不限于字体、图片等资源来源于互联网。如果出现侵权可联系本项目移除。
-
-### 五、免责声明
-
-5.1 由于使用本项目产生的包括由于本协议或由于使用或无法使用本项目而引起的任何性质的任何直接、间接、特殊、偶然或结果性损害（包括但不限于因商誉损失、停工、计算机故障或故障引起的损害赔偿，或任何及所有其他商业损害或损失）由使用者负责。
-
-### 六、使用限制
-
-6.1 本项目完全免费，且开源发布于 GitHub 面向全世界人用作对技术的学习交流。本项目不对项目内的技术可能存在违反当地法律法规的行为作保证。
-
-6.2 **禁止在违反当地法律法规的情况下使用本项目。** 对于使用者在明知或不知当地法律法规不允许的情况下使用本项目所造成的任何违法违规行为由使用者承担，本项目不承担由此造成的任何直接、间接、特殊、偶然或结果性责任。
-
-### 七、版权保护
-
-7.1 音乐平台不易，请尊重版权，支持正版。
-
-### 八、非商业性质
-
-8.1 本项目仅用于对技术可行性的探索及研究，不接受任何商业（包括但不限于广告等）合作及捐赠。
-
-### 九、接受协议
-
-9.1 若你使用了本项目，即代表你接受本协议。
-
----
-
-若对此有疑问请 mail to: lyswhut+qq.com (请将 `+` 替换成 `@`)
+本软件不提供任何音源，用户导入的内容由用户自行负责，请遵守当地法律与版权。

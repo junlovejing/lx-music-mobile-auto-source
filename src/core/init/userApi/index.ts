@@ -5,6 +5,10 @@ import BackgroundTimer from 'react-native-background-timer'
 import { fetchData } from './request'
 import { getUserApiList } from '@/utils/data'
 import { confirmDialog, openUrl, tipDialog } from '@/utils/tools'
+import { USER_API_AUTO_ID } from '@/sources/constants'
+import { state as userApiState } from '@/store/userApi/state'
+import { setLoadedSourceId } from '@/sources/userSources'
+import { getExpectedSourceId } from '@/core/userApiFailover'
 
 
 export default async(setting: LX.AppSetting) => {
@@ -73,9 +77,19 @@ export default async(setting: LX.AppSetting) => {
   }
   const handleStateChange = ({ status, errorMessage, info }: InitParams) => {
     // console.log(status, message, info)
+    const expectedId = getExpectedSourceId()
+    if (expectedId && info?.id !== expectedId) return
     setUserApiStatus(status, errorMessage)
-    if (!info || info.id !== settingState.setting['common.apiSource']) return
+    const settingId = settingState.setting['common.apiSource']
+    // auto 模式下实际 load 的是本地名单里的具体 id，允许匹配
+    const inLocalList = !!info && info.id !== USER_API_AUTO_ID && userApiState.list.some(api => api.id === info.id)
+    const matched = !!info && (
+      info.id === settingId ||
+      (settingId === USER_API_AUTO_ID && inLocalList)
+    )
+    if (!matched) return
     if (status) {
+      if (inLocalList) setLoadedSourceId(info.id)
       if (info.sources) {
         let apis: any = {}
         let qualitys: LX.QualityList = {}
