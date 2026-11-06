@@ -258,6 +258,8 @@
   "setting_basic_allow_progress_bar_seek": "Allow to adjust playback progress by progress bar in bottom",
   "setting_basic_always_keep_statusbar_height": "Always keep status bar height",
   "setting_basic_always_keep_statusbar_height_tip": "By default, the app dynamically determines whether spacing needs to be kept for the system status bar, but if there is a situation on your device where the app's interactable content overlaps with the display of the status bar content, you can enable this option to always keep space for the system status bar.",
+  "setting_basic_force_landscape_layout": "Car mode: always use landscape layout",
+  "setting_basic_force_landscape_layout_tip": "For fixed-landscape car displays. The main screen, settings, and play detail keep the landscape layout even if Android temporarily reports a portrait or narrow window.",
   "setting_basic_animation": "Randomize pop-up animation",
   "setting_basic_auto_hide_play_bar": "Hide playbar when keyboard pops up",
   "setting_basic_drawer_layout_position": "Direction of Navigation & List Popup",

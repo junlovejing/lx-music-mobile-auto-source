@@ -258,6 +258,8 @@
   "setting_basic_allow_progress_bar_seek": "允許透過底欄進度條調整播放進度",
   "setting_basic_always_keep_statusbar_height": "總是保留狀態欄高度",
   "setting_basic_always_keep_statusbar_height_tip": "預設情況下，軟體會動態判斷是否需要為系統狀態欄保留間距，但如果在你的裝置上出現軟體可互動內容與狀態欄內容顯示重疊的情況，可以啟用該選項以始終為系統狀態欄保留空間。",
+  "setting_basic_force_landscape_layout": "車機模式：始終使用橫屏佈局",
+  "setting_basic_force_landscape_layout_tip": "適用於固定橫屏的車機。啟用後，即使系統暫時回報豎屏或窄視窗尺寸，主介面、設定和播放詳情仍使用橫屏佈局。",
   "setting_basic_animation": "彈出層隨機動畫",
   "setting_basic_auto_hide_play_bar": "彈出鍵盤時自動隱藏播放欄",
   "setting_basic_drawer_layout_position": "導航、收藏清單彈出方向",

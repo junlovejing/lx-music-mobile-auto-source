@@ -80,6 +80,11 @@ declare global {
       'common.alwaysKeepStatusbarHeight': boolean
 
       /**
+       * 始终使用横屏布局，供固定横屏车机使用
+       */
+      'common.forceLandscapeLayout': boolean
+
+      /**
        * 主题id
        */
       'theme.id': string

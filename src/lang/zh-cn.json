@@ -258,6 +258,8 @@
   "setting_basic_allow_progress_bar_seek": "允许通过底栏进度条调整播放进度",
   "setting_basic_always_keep_statusbar_height": "总是保留状态栏高度",
   "setting_basic_always_keep_statusbar_height_tip": "默认情况下，软件会动态判断是否需要为系统状态栏保留间距，但如果在你的设备上出现软件可交互内容与状态栏内容显示重叠的情况，可以启用该选项以始终为系统状态栏保留空间。",
+  "setting_basic_force_landscape_layout": "车机模式：始终使用横屏布局",
+  "setting_basic_force_landscape_layout_tip": "适用于固定横屏的车机。开启后，即使系统临时上报竖屏或窄窗口尺寸，主界面、设置和播放详情仍使用横屏布局。",
   "setting_basic_animation": "弹出层随机动画",
   "setting_basic_auto_hide_play_bar": "弹出键盘时自动隐藏播放栏",
   "setting_basic_drawer_layout_position": "导航、收藏列表弹出方向",
