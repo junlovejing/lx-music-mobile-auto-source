@@ -12,6 +12,12 @@ import {
   resolveInitialSourceId,
   setLoadedSourceId,
 } from '@/sources/userSources'
+import { pickSourceToProbe, rankSourceIds, recordSourceFailure } from '@/sources/sourceHealth'
+import BackgroundTimer from 'react-native-background-timer'
+
+let probeTimer: number | null = null
+let probeRunning = false
+let activeProbeSongKey = ''
 
 let initGeneration = 0
 /** 这次 load 期望的用户导入的源。对不上的初始化事件丢掉，避免上一轮把下一轮结束掉。 */
@@ -88,9 +94,14 @@ export const loadUserSource = async(apiId: string) => {
   }
   setLoadedSourceId(null)
   resetApiInitPromise()
-  await setUserApi(apiId)
-  const ok = await waitApiReady()
-  if (!ok) throw new Error('source init failed')
+  try {
+    await setUserApi(apiId)
+    const ok = await waitApiReady()
+    if (!ok) throw new Error('source init failed')
+  } catch (err) {
+    recordSourceFailure(apiId)
+    throw err
+  }
   setLoadedSourceId(apiId)
   return true
 }
@@ -176,4 +187,40 @@ export const tryUserSourceFailover = async(
     if (!recovered) throw err
     return recovered
   }
+}
+
+/** Delay one silent URL lookup until playback is established, then restore the best source. */
+export const scheduleUserSourceBackgroundProbe = (
+  tryOnce: () => Promise<{ url: string, type: LX.Quality }>,
+  songKey: string,
+) => {
+  if (!isAutoApiSource() || !songKey || songKey === activeProbeSongKey) return
+  activeProbeSongKey = songKey
+  if (probeTimer != null) BackgroundTimer.clearTimeout(probeTimer)
+  probeTimer = BackgroundTimer.setTimeout(() => {
+    probeTimer = null
+    if (probeRunning || !isAutoApiSource() || activeProbeSongKey !== songKey) return
+    const candidate = pickSourceToProbe(getLocalPlayableIds(), getLoadedSourceId() ?? '')
+    if (!candidate) return
+    probeRunning = true
+    void (async() => {
+      try {
+        await loadUserSource(candidate)
+        if (!isAutoApiSource() || activeProbeSongKey !== songKey) return
+        await tryOnce()
+      } catch (err) {
+        console.log('[userApi health probe]', candidate, err)
+      } finally {
+        try {
+          if (isAutoApiSource() && activeProbeSongKey === songKey) {
+            const best = rankSourceIds(getLocalPlayableIds())[0]
+            if (best && best !== getLoadedSourceId()) await loadUserSource(best)
+          }
+        } catch (err) {
+          console.log('[userApi health probe] restore failed', err)
+        }
+        probeRunning = false
+      }
+    })()
+  }, 12_000)
 }

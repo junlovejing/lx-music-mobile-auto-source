@@ -11,6 +11,8 @@ import settingState from '@/store/setting/state'
 import { requestMsg } from '@/utils/message'
 import BackgroundTimer from 'react-native-background-timer'
 import { apis } from '@/utils/musicSdk/api-source'
+import { getLoadedSourceId } from '@/sources/userSources'
+import { recordSourceFailure, recordSourceSuccess } from '@/sources/sourceHealth'
 
 
 const getOtherSourcePromises = new Map()
@@ -297,16 +299,28 @@ export const handleGetOnlineMusicUrl = async({ musicInfo, quality, onToggleSourc
 }> => {
   // console.log(musicInfo.source)
   const targetQuality = quality ?? getPlayQuality(settingState.setting['player.playQuality'], musicInfo)
+  const songKey = `${musicInfo.name}\n${musicInfo.singer}\n${musicInfo.interval}`
 
   const tryOnce = async(): Promise<{ url: string, type: LX.Quality }> => {
     if (!await global.lx.apiInitPromise[0]) throw new Error('source init failed')
+    const sourceId = getLoadedSourceId() ?? ''
+    const started = Date.now()
     let reqPromise
     try {
       reqPromise = musicSdk[musicInfo.source].getMusicUrl(toOldMusicInfo(musicInfo), targetQuality).promise
     } catch (err: any) {
       reqPromise = Promise.reject(err)
     }
-    return reqPromise
+    try {
+      const result = await reqPromise
+      const resultUrl = result?.url
+      if (typeof resultUrl !== 'string' || !/^https?:\/\//i.test(resultUrl)) throw new Error('invalid music url')
+      recordSourceSuccess(sourceId, Date.now() - started)
+      return result
+    } catch (err) {
+      recordSourceFailure(sourceId)
+      throw err
+    }
   }
 
   const initialAttempt = async() => {
@@ -320,6 +334,11 @@ export const handleGetOnlineMusicUrl = async({ musicInfo, quality, onToggleSourc
     return tryOnce()
   }
   return initialAttempt().then(({ url, type }: { url: string, type: LX.Quality }) => {
+    if (settingState.setting['common.apiSource'] === 'user_api_auto') {
+      void import('@/core/userApiFailover').then(({ scheduleUserSourceBackgroundProbe }) => {
+        scheduleUserSourceBackgroundProbe(tryOnce, songKey)
+      })
+    }
     return { musicInfo, url, quality: type, isFromCache: false }
   }).catch(async(err: any) => {
     console.log(err)
@@ -327,8 +346,11 @@ export const handleGetOnlineMusicUrl = async({ musicInfo, quality, onToggleSourc
     try {
       const { isAutoApiSource, tryUserSourceFailover } = await import('@/core/userApiFailover')
       if (isAutoApiSource() || (settingState.setting['common.sourceListUrl'] && settingState.setting['common.apiSource'].startsWith('user_api_subscription_'))) {
-        const songKey = `${musicInfo.name}\n${musicInfo.singer}\n${musicInfo.interval}`
         const result = await tryUserSourceFailover(tryOnce, songKey)
+        if (isAutoApiSource()) {
+          const { scheduleUserSourceBackgroundProbe } = await import('@/core/userApiFailover')
+          scheduleUserSourceBackgroundProbe(tryOnce, songKey)
+        }
         return { musicInfo, url: result.url, quality: result.type, isFromCache: false }
       }
     } catch (failoverErr: any) {

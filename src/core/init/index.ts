@@ -13,6 +13,7 @@ import commonActions from '@/store/common/action'
 import settingState from '@/store/setting/state'
 import { bootLog } from '@/utils/bootLog'
 import { initializeUserSources } from '@/sources/userSources'
+import { hydrateSourceHealth } from '@/sources/sourceHealth'
 
 let isFirstPush = true
 const handlePushedHomeScreen = async() => {
@@ -47,6 +48,7 @@ export default async() => {
   await initUserApi(setting)
   bootLog('User Api inited.')
 
+  await hydrateSourceHealth()
   const sources = await initializeUserSources()
   const selected = setting['common.apiSource']
   if ((selected !== 'user_api_auto' && !sources.some(item => item.id === selected)) || !sources.length) {

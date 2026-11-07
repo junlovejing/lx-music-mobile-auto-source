@@ -31,6 +31,7 @@ function harness(initial = []) {
   const ensure = load('src/sources/userSources.ts', {
     './constants': { USER_API_AUTO_ID: autoId }, '@/utils/data': data,
     '@/core/userApi': apis, '@/store/userApi/state': { state },
+    './sourceHealth': { rankSourceIds: ids => [...ids] },
   })
   return { ensure, state, data, apis, removed }
 }
@@ -58,6 +59,24 @@ test('reordering changes the retry order and deleted sources disappear', async()
   assert.deepEqual(Array.from(h.ensure.getSourceRetryOrder(['user_api_c'])), ['user_api_a'])
 })
 
+test('adaptive source health persists measurements and promotes reliable fast sources', async() => {
+  let stored
+  const health = load('src/sources/sourceHealth.ts', {
+    '@/plugins/storage': {
+      getData: async() => stored,
+      saveData: async(_key, value) => { stored = JSON.parse(JSON.stringify(value)) },
+    },
+  })
+  await health.hydrateSourceHealth()
+  health.recordSourceSuccess('fast', 400, 1_000)
+  health.recordSourceSuccess('slow', 8_000, 1_001)
+  health.recordSourceFailure('broken', 1_002)
+  health.recordSourceFailure('broken', 1_003)
+  assert.deepEqual(Array.from(health.rankSourceIds(['unknown', 'slow', 'broken', 'fast'], 2_000)), ['fast', 'slow', 'unknown', 'broken'])
+  health.recordSourceSuccess('broken', 200, 2_001)
+  assert.equal(health.getSourceHealth('broken').cooldownUntil, 0)
+})
+
 async function playbackHarness(failInit = [], subscription = {}) {
   const h = harness(['a', 'b', 'c'].map(id => ({ id: `user_api_${id}` })))
   await h.ensure.initializeUserSources()
@@ -79,6 +98,12 @@ async function playbackHarness(failInit = [], subscription = {}) {
       return subscription.update ? subscription.update() : false
     } },
     '@/sources/subscriptionRecovery': load('src/sources/subscriptionRecovery.ts'),
+    '@/sources/sourceHealth': {
+      recordSourceFailure() {},
+      rankSourceIds: ids => [...ids],
+      pickSourceToProbe: () => null,
+    },
+    'react-native-background-timer': { default: { setTimeout, clearTimeout } },
   }, globals)
   return { ...h, setting, globals, loaded, failover }
 }
