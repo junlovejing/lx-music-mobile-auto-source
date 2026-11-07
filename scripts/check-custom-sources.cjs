@@ -10,6 +10,9 @@ const forbidden = [
   ['全都', '要'].join(''),
 ]
 const names = execFileSync('git', ['ls-files', '--cached', '--others', '--exclude-standard', '-z']).toString().split('\0')
+// Upstream release history contains contributor handles that can overlap with a
+// provider marker; it is documentation and is never packaged into the app.
+const historicalDocs = new Set(['CHANGELOG.md'])
 // Only the user-selected APK download proxy is allowed in these documentation files.
 const downloadDocs = new Set(['README.md', 'README.en.md', 'publish/changeLog.md'])
 const proxyHost = ['gh', 'proxy.com'].join('-')
@@ -24,6 +27,7 @@ const allowedDownloadLink = (link) => {
 const failures = []
 for (const name of names) {
   if (!name || !fs.existsSync(name) || name.startsWith('.ssh-deploy/')) continue
+  if (historicalDocs.has(name)) continue
   if (!/\.(?:[cm]?js|jsx|ts|tsx|json|md|ya?ml|xml|gradle|plist|txt)$/.test(name)) continue
   let text = fs.readFileSync(name, 'utf8')
   if (downloadDocs.has(name)) text = text.replace(/https:\/\/[^\s)]+/g, link => allowedDownloadLink(link) ? '' : link)
