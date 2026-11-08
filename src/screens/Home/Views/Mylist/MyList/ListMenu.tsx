@@ -23,6 +23,7 @@ export interface ListMenuProps {
   onRename: (listInfo: LX.List.UserListInfo) => void
   onSort: (listInfo: LX.List.MyListInfo) => void
   onDuplicateMusic: (listInfo: LX.List.MyListInfo) => void
+  onRandomPlay: (listInfo: LX.List.MyListInfo) => void
   onImport: (listInfo: LX.List.MyListInfo, index: number) => void
   onExport: (listInfo: LX.List.MyListInfo, index: number) => void
   onSync: (listInfo: LX.List.UserListInfo) => void
@@ -42,6 +43,7 @@ export default forwardRef<ListMenuType, ListMenuProps>(({
   onRename,
   onSort,
   onDuplicateMusic,
+  onRandomPlay,
   onImport,
   onExport,
   onSync,
@@ -88,6 +90,7 @@ export default forwardRef<ListMenuType, ListMenuProps>(({
 
     setMenus([
       { action: 'new', label: t('list_create') },
+      { action: 'randomPlay', label: t('lists__play_random') },
       { action: 'rename', disabled: !rename, label: t('list_rename') },
       { action: 'sort', label: t('list_sort') },
       { action: 'duplicateMusic', label: t('lists__duplicate') },
@@ -105,6 +108,9 @@ export default forwardRef<ListMenuType, ListMenuProps>(({
     switch (action) {
       case 'new':
         onNew(Math.max(selectInfo.index - 1, 0))
+        break
+      case 'randomPlay':
+        onRandomPlay(selectInfo.listInfo)
         break
       case 'rename':
         onRename(selectInfo.listInfo as LX.List.UserListInfo)

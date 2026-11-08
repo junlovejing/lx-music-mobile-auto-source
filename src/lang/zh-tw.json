@@ -125,6 +125,7 @@
   "list_update_success": "「{name}」更新成功",
   "list_updating": "更新中",
   "lists__duplicate": "重複歌曲",
+  "lists__play_random": "開始隨機播放",
   "lists_dislike_music_add_tip": "已添加",
   "lists_dislike_music_singer_tip": "你真的不喜歡「{singer}」的「{name}」嗎？",
   "lists_dislike_music_tip": "你真的不喜歡「{name}」嗎？",

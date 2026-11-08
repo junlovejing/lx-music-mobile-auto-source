@@ -7,6 +7,9 @@ import ListImportExport, { type ListImportExportType } from './ListImportExport'
 import { handleRemove, handleSync } from './listAction'
 import ListMusicSort, { type ListMusicSortType } from './ListMusicSort'
 import DuplicateMusic, { type DuplicateMusicType } from './DuplicateMusic'
+import { getListMusics } from '@/core/list'
+import { playList } from '@/core/player/player'
+import { updateSetting } from '@/core/common'
 
 
 export default () => {
@@ -16,6 +19,13 @@ export default () => {
   const listMusicSortRef = useRef<ListMusicSortType>(null)
   const duplicateMusicRef = useRef<DuplicateMusicType>(null)
   const listImportExportRef = useRef<ListImportExportType>(null)
+
+  const handleRandomPlay = async(listInfo: LX.List.MyListInfo) => {
+    const list = await getListMusics(listInfo.id)
+    if (!list.length) return
+    updateSetting({ 'player.togglePlayMethod': 'random' })
+    await playList(listInfo.id, Math.floor(Math.random() * list.length))
+  }
 
   useEffect(() => {
     let isInited = false
@@ -48,6 +58,7 @@ export default () => {
             onRename={info => listNameEditRef.current?.show(info)}
             onSort={info => listMusicSortRef.current?.show(info)}
             onDuplicateMusic={info => duplicateMusicRef.current?.show(info)}
+            onRandomPlay={info => { void handleRandomPlay(info) }}
             onImport={(info, position) => listImportExportRef.current?.import(info, position)}
             onExport={(info, position) => listImportExportRef.current?.export(info, position)}
             onRemove={info => { handleRemove(info) }}

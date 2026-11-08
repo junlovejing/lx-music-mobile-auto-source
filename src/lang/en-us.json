@@ -125,6 +125,7 @@
   "list_update_success": "Successfully updated \"{name}\"",
   "list_updating": "Updating",
   "lists__duplicate": "Duplicate Songs",
+  "lists__play_random": "Start shuffle",
   "lists_dislike_music_add_tip": "Added",
   "lists_dislike_music_singer_tip": "Do you really dislike {singer}'s \"{name}\"?",
   "lists_dislike_music_tip": "Do you really dislike \"{name}\"?",
